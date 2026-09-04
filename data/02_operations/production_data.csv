@@ -1,0 +1,1 @@
+timestamp,production_line,machine_id,product_id,target_units,actual_units,cycle_time_sec,downtime_sec,defect_count,quality_percent
