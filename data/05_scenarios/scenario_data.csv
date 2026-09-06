@@ -1,0 +1,1 @@
+scenario_id,scenario_name,scenario_type,start_time,duration_min,grid_available_power_kw,solar_available_power_kw,required_reduction_kw,minimum_production_percent,battery_available_kwh

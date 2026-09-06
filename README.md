@@ -1,4 +1,6 @@
-# Gazebo Factory Twin (Part 1)
+# INDUS_TWIN
+
+## Gazebo Factory Twin
 
 This is a standalone ROS 2 Jazzy + Gazebo factory simulator. Gazebo renders five colour-coded machines on a factory floor; the ROS node emits realistic power, energy, temperature, vibration, RPM, production and operating state for each machine every second.
 

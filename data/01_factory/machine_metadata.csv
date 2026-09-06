@@ -1,0 +1,11 @@
+machine_id,machine_name,machine_type,production_line,rated_power_kw,efficiency_percent,criticality,controllability,location_x_m,location_y_m,primary_process
+FURN_01,Induction Heating Furnace,furnace,LINE_01,75,,HIGH,FIXED,5,5,Heating
+ROLL_01,Rolling Mill Drive,rolling_mill,LINE_01,30,93.6,HIGH,MODULATING,12,5,Rolling
+CNC_01,CNC Finishing Machine,cnc,LINE_01,30,93.6,HIGH,FIXED,20,5,Finishing
+COMP_01,Air Compressor,compressor,UTILITY,37,90,MEDIUM,MODULATING,5,15,Compressed_Air
+PUMP_01,Cooling Water Pump,pump,UTILITY,15,92.1,MEDIUM,MODULATING,12,15,Cooling
+PUMP_02,Hydraulic Pump,pump,LINE_01,22,93,MEDIUM,MODULATING,20,15,Hydraulics
+FAN_01,Dust Extraction Fan,fan,UTILITY,15,92.1,LOW,CURTAILABLE,27,15,Extraction
+HVAC_01,Industrial HVAC Ventilation,hvac,UTILITY,22,93,LOW,CURTAILABLE,5,22,Ventilation
+CONV_01,Material Conveyor,conveyor,LINE_01,11,,MEDIUM,SHIFTABLE,15,22,Material_Handling
+MOTOR_01,Auxiliary Motor,auxiliary_motor,LINE_01,7.5,90.4,LOW,CURTAILABLE,25,22,Auxiliary
