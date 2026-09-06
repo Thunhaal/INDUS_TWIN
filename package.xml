@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>gazebo_factory_twin</name>
+  <version>0.1.0</version>
+  <description>Part 1 factory digital twin: Gazebo scene plus ROS 2 telemetry and control simulation.</description>
+  <maintainer email="student@example.com">Factory Twin Team</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
