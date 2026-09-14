@@ -1,0 +1,36 @@
+{
+  "factory_id": "FACTORY_01",
+  "factory_name": "Smart Steel Manufacturing Reference Factory",
+  "industry_type": "Steel Manufacturing",
+  "country": "India",
+
+  "operating_schedule": {
+    "start_time": "00:00",
+    "end_time": "23:59",
+    "number_of_shifts": 3,
+    "working_days_per_week": 6
+  },
+
+  "production": {
+    "number_of_production_lines": 1
+  },
+
+  "electrical_system": {
+    "supply_voltage_v": 415,
+    "frequency_hz": 50,
+    "connected_load_kw": 265,
+    "maximum_grid_import_kw": 250
+  },
+
+  "energy_source": {
+    "grid_connected": true,
+    "solar_installed_kw": 0,
+    "battery_installed": false
+  },
+
+  "data_reference": {
+    "energy_dataset": "Steel Plant Energy Consumption",
+    "source_type": "Public open dataset",
+    "reference_time_resolution_minutes": 15
+  }
+}

@@ -1,0 +1,25 @@
+Possible Values for description:
+
+OVERCONSUMPTION
+Machine consuming more power than its expected baseline.
+
+HIGH_VIBRATION
+Vibration exceeds the machine's normal operating range.
+
+OVERHEATING
+Temperature exceeds the defined safe operating range.
+
+EFFICIENCY_DROP
+Power consumption increases without corresponding production increase.
+
+IDLE_OPERATION
+Machine remains energized while no useful production activity occurs.
+
+UNPLANNED_DOWNTIME
+Unexpected machine stoppage affecting production.
+
+FAULT
+Machine enters an abnormal/failure state.
+
+MAINTENANCE
+Machine is intentionally taken offline for inspection or repair.
