@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+
+ai_engine/*_output.csv
+ai_engine/*.csv
+
+data/06_ai/
