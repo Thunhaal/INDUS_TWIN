@@ -66,6 +66,12 @@ Gazebo world:
 
 src/gazebo_factory_twin/worlds/factory_floor.sdf
 
+The factory world also includes 10 visible active operators and a south-side
+employee car park with 8 bays (4 occupied and 4 available).
+It is enclosed by a 2.4 m perimeter fence, four corner cameras, security
+lighting, and a south-side controlled entry gate with a guard booth and RFID
+vehicle barrier.
+
 ROS 2 factory node:
 
 src/gazebo_factory_twin/gazebo_factory_twin/factory_twin_node.py

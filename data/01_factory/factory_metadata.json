@@ -12,7 +12,16 @@
   },
 
   "production": {
-    "number_of_production_lines": 1
+    "number_of_production_lines": 1,
+    "active_factory_workers": 10
+  },
+
+  "site_facilities": {
+    "employee_parking_bays": 8,
+    "occupied_parking_bays": 4,
+    "available_parking_bays": 4,
+    "perimeter_security": "2.4 m fenced boundary with corner cameras",
+    "main_entry": "guard booth, RFID barrier, sliding vehicle gate"
   },
 
   "electrical_system": {
