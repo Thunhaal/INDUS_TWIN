@@ -1,8 +1,8 @@
-__pycache__/
-*.py[cod]
 build/
 install/
 log/
-.gz/
+__pycache__/
+*.pyc
+
 data/02_operations/machine_telemetry.csv
 data/02_operations/production_data.csv
