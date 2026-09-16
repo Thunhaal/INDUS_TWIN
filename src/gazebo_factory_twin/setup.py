@@ -19,7 +19,10 @@ setup(
     "console_scripts": [
         "factory_twin_node = gazebo_factory_twin.factory_twin_node:main",
         "telemetry_logger = gazebo_factory_twin.telemetry_logger:main",
-        "production_logger = gazebo_factory_twin.production_logger:main"
-    ]
+        "production_logger = gazebo_factory_twin.production_logger:main",
+        "grid_logger = gazebo_factory_twin.grid_logger:main",
+	"scenario_manager = gazebo_factory_twin.scenario_manager:main",
+	"ai_engine = gazebo_factory_twin.ai_engine_node:main",
+ ]
 },
 )

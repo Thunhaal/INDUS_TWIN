@@ -20,11 +20,19 @@ def generate_launch_description():
 
     return LaunchDescription([
 
+        # ====================================================
+        # FACTORY TWIN / GAZEBO
+        # ====================================================
+
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 factory_launch
             )
         ),
+
+        # ====================================================
+        # TELEMETRY LOGGER
+        # ====================================================
 
         Node(
             package="gazebo_factory_twin",
@@ -33,10 +41,47 @@ def generate_launch_description():
             output="screen"
         ),
 
+        # ====================================================
+        # PRODUCTION LOGGER
+        # ====================================================
+
         Node(
             package="gazebo_factory_twin",
             executable="production_logger",
             name="production_logger",
             output="screen"
-        )
+        ),
+
+        # ====================================================
+        # SCENARIO MANAGER
+        # ====================================================
+
+        Node(
+            package="gazebo_factory_twin",
+            executable="scenario_manager",
+            name="scenario_manager",
+            output="screen"
+        ),
+
+        # ====================================================
+        # GRID LOGGER
+        # ====================================================
+
+        Node(
+            package="gazebo_factory_twin",
+            executable="grid_logger",
+            name="grid_logger",
+            output="screen"
+        ),
+
+        # ====================================================
+        # LIVE AI ENGINE
+        # ====================================================
+
+        Node(
+            package="gazebo_factory_twin",
+            executable="ai_engine",
+            name="ai_engine",
+            output="screen"
+        ),
     ])

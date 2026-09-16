@@ -1,9 +1,24 @@
+# ROS 2 generated files
 build/
 install/
 log/
-__pycache__/
-*.pyc
-.venv/
 
+# Runtime telemetry/production data
 data/02_operations/machine_telemetry.csv
 data/02_operations/production_data.csv
+
+# Runtime grid/scenario data
+data/04_grid/grid_data.csv
+data/05_scenarios/scenario_data.csv
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated AI outputs
+ai_engine/*_output.csv
+
+# Generated AI features
+data/06_ai/

@@ -1,0 +1,56 @@
+{
+  "NORMAL": {
+    "scenario_name": "Normal Operation",
+    "scenario_type": "NORMAL",
+    "duration_min": 60,
+    "grid_available_power_kw": 250,
+    "solar_available_power_kw": 15,
+    "required_reduction_kw": 0,
+    "minimum_production_percent": 95,
+    "battery_available_kwh": 100
+  },
+
+  "GRID_STRESS": {
+    "scenario_name": "Grid Stress Event",
+    "scenario_type": "GRID_STRESS",
+    "duration_min": 30,
+    "grid_available_power_kw": 215,
+    "solar_available_power_kw": 10,
+    "required_reduction_kw": 15,
+    "minimum_production_percent": 95,
+    "battery_available_kwh": 80
+  },
+
+  "PEAK_DEMAND": {
+    "scenario_name": "Peak Demand",
+    "scenario_type": "PEAK_DEMAND",
+    "duration_min": 30,
+    "grid_available_power_kw": 225,
+    "solar_available_power_kw": 10,
+    "required_reduction_kw": 15,
+    "minimum_production_percent": 95,
+    "battery_available_kwh": 80
+  },
+
+  "LOW_RENEWABLE": {
+    "scenario_name": "Low Renewable Availability",
+    "scenario_type": "LOW_RENEWABLE",
+    "duration_min": 60,
+    "grid_available_power_kw": 250,
+    "solar_available_power_kw": 2,
+    "required_reduction_kw": 0,
+    "minimum_production_percent": 95,
+    "battery_available_kwh": 80
+  },
+
+  "CRITICAL_GRID": {
+    "scenario_name": "Critical Grid Constraint",
+    "scenario_type": "CRITICAL_GRID",
+    "duration_min": 15,
+    "grid_available_power_kw": 200,
+    "solar_available_power_kw": 5,
+    "required_reduction_kw": 30,
+    "minimum_production_percent": 90,
+    "battery_available_kwh": 60
+  }
+}
