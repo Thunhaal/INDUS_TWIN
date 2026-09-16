@@ -1,1 +1,8 @@
 scenario_id,scenario_name,scenario_type,start_time,duration_min,grid_available_power_kw,solar_available_power_kw,required_reduction_kw,minimum_production_percent,battery_available_kwh
+1789570371,NORMAL,Normal Operation,NORMAL,60,250,15,0,95,100,STARTED
+1789572290,NORMAL,Normal Operation,NORMAL,60,250,15,0,95,100,STARTED
+1789572319,GRID_STRESS,Grid Stress Event,GRID_STRESS,30,215,10,15,95,80,STARTED
+1789573109,NORMAL,Normal Operation,NORMAL,60,250,15,0,95,100,STARTED
+1789573184,GRID_STRESS,Grid Stress Event,GRID_STRESS,30,215,10,15,95,80,STARTED
+1789573494,NORMAL,Normal Operation,NORMAL,60,250,15,0,95,100,STARTED
+1789573656,NORMAL,Normal Operation,NORMAL,60,250,15,0,95,100,STARTED
