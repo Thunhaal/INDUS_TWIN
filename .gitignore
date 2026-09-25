@@ -1,24 +1,161 @@
-# ROS 2 generated files
+# =========================================================
+# INDUS_TWIN — GITIGNORE
+# =========================================================
+
+
+# =========================================================
+# ROS 2 GENERATED FILES
+# =========================================================
+
 build/
 install/
 log/
 
-# Runtime telemetry/production data
-data/02_operations/machine_telemetry.csv
-data/02_operations/production_data.csv
 
-# Runtime grid/scenario data
-data/04_grid/grid_data.csv
-data/05_scenarios/scenario_data.csv
-# Python virtual environment
+# =========================================================
+# PYTHON VIRTUAL ENVIRONMENTS
+# Keep ALL virtual environments local
+# =========================================================
+
 .venv/
+**/.venv/
 
-# Python cache
+
+# =========================================================
+# PYTHON CACHE / COMPILED FILES
+# =========================================================
+
 __pycache__/
-*.pyc
+**/__pycache__/
 
-# Generated AI outputs
+*.pyc
+*.pyo
+*.pyd
+
+
+# =========================================================
+# FRONTEND / NODE
+# =========================================================
+
+node_modules/
+**/node_modules/
+
+dist/
+**/dist/
+
+.vite/
+**/.vite/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+# =========================================================
+# ENVIRONMENT / LOCAL CONFIG
+# =========================================================
+
+.env
+.env.*
+!.env.example
+
+
+# =========================================================
+# BACKUPS / TEMPORARY FILES
+# =========================================================
+
+*.backup
+*.backup*
+*.bak
+*.old
+*.orig
+*~
+*.tmp
+
+*backup*/
+*Backup*/
+*old*/
+*Old*/
+
+
+# =========================================================
+# AI GENERATED OUTPUTS
+# =========================================================
+
 ai_engine/*_output.csv
 
-# Generated AI features
+
+# =========================================================
+# RUNTIME AI DATA
+# =========================================================
+
 data/06_ai/
+
+
+# =========================================================
+# RUNTIME OPERATIONAL DATA
+# These files are generated while INDUS_TWIN runs
+# =========================================================
+
+data/02_operations/machine_telemetry.csv
+data/02_operations/production_data.csv
+data/02_operations/quality_inspection.csv
+
+
+# =========================================================
+# RUNTIME MAINTENANCE DATA
+# =========================================================
+
+data/03_maintenance/maintenance_events.csv
+
+
+# =========================================================
+# RUNTIME GRID DATA
+# =========================================================
+
+data/04_grid/grid_data.csv
+
+
+# =========================================================
+# RUNTIME SCENARIO DATA
+# =========================================================
+
+data/05_scenarios/scenario_data.csv
+
+
+# =========================================================
+# LOG / DEBUG FILES
+# =========================================================
+
+*.log
+
+
+# =========================================================
+# OS / EDITOR FILES
+# =========================================================
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+
+# =========================================================
+# COVERAGE / TEST ARTIFACTS
+# =========================================================
+
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+
+# =========================================================
+# LOCAL DATABASE / TEMP DATA
+# =========================================================
+
+*.sqlite
+*.sqlite3
+*.db

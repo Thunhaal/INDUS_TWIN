@@ -1,11 +1,8 @@
 machine_id,min_operating_power_kw,max_reduction_kw,max_curtailment_duration_min,ramp_rate_kw_per_min,minimum_runtime_min,minimum_shutdown_min,can_curtail,can_shift
-FURN_01,70,0,0,2,60,60,no,no
-ROLL_01,20,10,10,5,30,20,no,yes
 CNC_01,20,3,5,10,20,10,no,yes
+CNC_02,20,3,5,10,20,10,no,yes
+CNC_03,20,3,5,10,20,10,no,yes
 COMP_01,20,15,20,10,15,10,yes,yes
 PUMP_01,8,5,15,8,10,5,yes,yes
-PUMP_02,10,5,15,8,10,5,yes,yes
-FAN_01,5,8,30,12,5,2,yes,yes
 HVAC_01,8,12,30,15,5,2,yes,yes
-CONV_01,4,6,20,10,10,5,yes,yes
-MOTOR_01,3,5,20,10,5,5,yes,yes
+FURNACE_01,70,0,0,2,60,60,no,no

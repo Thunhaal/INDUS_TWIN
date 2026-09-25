@@ -1,463 +1,1253 @@
-# INDUS_TWIN — PROJECT HANDOVER
+# INDUS_TWIN
+
+## Industrial Energy Digital Twin with Energy-Waste Recovery Mapping for Grid-Resilient Manufacturing
+
+INDUS_TWIN is a simulation-driven industrial energy management and digital-twin platform that models a manufacturing factory, machine operating states, production behavior, maintenance events, grid conditions, anomalies, and AI-assisted energy flexibility decisions.
+
+The system combines:
+
+- **ROS 2 Jazzy** for the factory digital twin and machine-state communication
+- **Gazebo** for factory simulation
+- **FastAPI** for backend APIs
+- **React + Vite** for the web dashboard
+- **Python AI modules** for anomaly detection, forecasting, maintenance risk, production impact, flexibility analysis, and control decisions
+- **OR-Tools** for constrained optimization
+- **Tkinter** for interactive anomaly injection
+- **CSV-based runtime data logging** for telemetry, production, maintenance, grid, scenarios, and AI features
+
+---
+
+# 1. System Overview
+
+INDUS_TWIN represents a simulated industrial factory containing seven machines:
+
+| Machine | Type |
+|---|---|
+| CNC_01 | Production |
+| CNC_02 | Production |
+| CNC_03 | Production |
+| COMP_01 | Utility / Process |
+| PUMP_01 | Utility / Process |
+| HVAC_01 | Utility / Process |
+| FURNACE_01 | Utility / Process |
+
+The digital twin continuously produces machine telemetry and factory operating information.
+
+The platform then connects this information to the AI pipeline and dashboard.
+
+```text
+                    ┌──────────────────────┐
+                    │   Gazebo Factory     │
+                    │    Digital Twin      │
+                    └──────────┬───────────┘
+                               │
+                               │ ROS 2
+                               ▼
+                    ┌──────────────────────┐
+                    │     Telemetry /      │
+                    │   Factory ROS Nodes  │
+                    └──────────┬───────────┘
+                               │
+                 ┌─────────────┼─────────────┐
+                 │             │             │
+                 ▼             ▼             ▼
+          Operations       Grid Data     Scenarios
+             │
+             ▼
+       ┌───────────────────┐
+       │   AI Pipeline     │
+       │                   │
+       │ Feature Engineer  │
+       │ Baseline          │
+       │ Anomaly           │
+       │ Forecasting       │
+       │ Maintenance Risk  │
+       │ Production Impact │
+       │ Flexibility       │
+       │ Final Decision    │
+       └─────────┬─────────┘
+                 │
+                 ▼
+       ┌───────────────────┐
+       │   FastAPI Backend  │
+       └─────────┬─────────┘
+                 │
+                 ▼
+       ┌───────────────────┐
+       │ React / Vite UI   │
+       │   INDUS_TWIN      │
+       └───────────────────┘
+
+       Tkinter Anomaly Injector
+                 │
+                 └──────► ROS 2 Factory Control
+```
+
+---
+
+# 2. Main Features
+
+## Factory Digital Twin
+
+The ROS 2 factory twin models the lifecycle of all seven machines.
+
+Machine states include:
+
+- `RUNNING`
+- `IDLE`
+- `MAINTENANCE`
+- `FAULT`
+
+The factory twin publishes machine telemetry and responds to control commands.
 
-## Important Codes :
+---
 
-## To Run overall system:
+## Persistent Anomaly Detection
 
-cd ~/INDUS_TWIN
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
+The anomaly system uses a rolling persistence window.
 
-ros2 launch gazebo_factory_twin factory_system.launch.py
+Current logic:
 
-## To run anamoly injector 
+```text
+Rolling window = 8 telemetry readings
+Persistent anomaly = 6 or more abnormal readings out of 8
+```
 
-cd ~/INDUS_TWIN
-source /opt/ros/jazzy/setup.bash
-source install/setup.bash
+Severity determines the resulting machine state:
 
-python3 anomaly_injector.py
+```text
+HIGH / CRITICAL
+        ↓
+      FAULT
 
-## PROJECT
+LOW / MEDIUM
+        ↓
+       IDLE
+```
 
-INDUS_TWIN is a ROS 2 + Gazebo industrial digital twin for:
+Faulted or idle machines remain in their corresponding state until maintenance handling restores them.
 
-Industrial Energy-Waste Recovery and Grid-Resilient Manufacturing.
+---
 
-Core idea:
+# 3. Maintenance Lifecycle
 
-Energy waste detection
-→ Recoverable flexibility
-→ Production impact check
-→ Virtual energy reserve
-→ Grid-response optimization
+Maintenance events are handled through a ticket lifecycle.
 
+```text
+SUBMITTED
+    │
+    ▼
+ONGOING
+    │
+    ▼
+COMPLETED
+```
 
-## ENVIRONMENT
+A maintenance ticket can also be reopened:
 
-Ubuntu 24.04
-ROS 2 Jazzy
-Gazebo Sim
-Python 3
-Apache Spark
+```text
+ONGOING
+   │
+   ▼
+SUBMITTED
+```
 
-Project:
+Maintenance commands are connected to the ROS 2 factory.
 
-~/INDUS_TWIN
+Typical behavior:
 
-Keep separate from:
+```text
+MAINTENANCE_START
+        ↓
+Machine enters MAINTENANCE
 
-~/ros2_ws
+MAINTENANCE_COMPLETE
+        ↓
+Machine returns to RUNNING
+```
 
+The maintenance event manager records ticket information in:
 
-## CURRENT FACTORY
-
-Seven machines:
-
-CNC_01
-CNC_02
-CNC_03
-COMP_01
-PUMP_01
-HVAC_01
-FURNACE_01
-
-Gazebo world:
-
-src/gazebo_factory_twin/worlds/factory_floor.sdf
-
-The factory world also includes 10 visible active operators and a south-side
-employee car park with 8 bays (4 occupied and 4 available).
-It is enclosed by a 2.4 m perimeter fence, four corner cameras, security
-lighting, and a south-side controlled entry gate with a guard booth and RFID
-vehicle barrier.
-
-ROS 2 factory node:
-
-src/gazebo_factory_twin/gazebo_factory_twin/factory_twin_node.py
-
-
-## ROS 2 TOPICS
-
-Machine telemetry:
-
-/factory/machine_state
-
-Total factory power:
-
-/factory/total_power_kw
-
-Events:
-
-/factory/events
-
-Grid stress:
-
-/factory/grid_stress_kw
-
-Control:
-
-/factory/control_command
-
-
-## MACHINE TELEMETRY
-
-Current telemetry fields:
-
-timestamp
-machine_id
-state
-power_kw
-energy_kwh
-load_percent
-temperature
-vibration
-rpm
-production_rate
-units_produced
-criticality
-grid_stress_kw
-
-Live telemetry rate:
-
-~1 second
-
-
-## MACHINE TELEMETRY CSV
-
-File:
-
-data/02_operations/machine_telemetry.csv
-
-Schema:
-
-timestamp,machine_id,state,power_kw,energy_kwh,load_percent,temperature_c,vibration_mm_s,rpm,production_rate,units_produced
-
-Status:
-
-WORKING
-
-Historical logging:
-
-~1 minute
-
-7 machine records are written approximately every minute.
-
-
-## PRODUCTION DATA CSV
-
-File:
-
-data/02_operations/production_data.csv
-
-Schema:
-
-timestamp,production_line,machine_id,product_id,target_units,actual_units,cycle_time_sec,downtime_sec,defect_count,quality_percent
-
-Status:
-
-WORKING
-
-7 production records are written approximately every minute.
-
-
-## LOGGERS
-
-Telemetry logger:
-
-src/gazebo_factory_twin/gazebo_factory_twin/telemetry_logger.py
-
-Production logger:
-
-src/gazebo_factory_twin/gazebo_factory_twin/production_logger.py
-
-Both subscribe to:
-
-/factory/machine_state
-
-
-## FACTORY DATA
-
-data/01_factory/factory_metadata.json
-
-data/01_factory/machine_metadata.csv
-
-data/01_factory/machine_constraints.csv
-
+```text
 data/03_maintenance/maintenance_events.csv
+```
 
-data/04_grid/grid_data.csv
+---
 
-data/05_scenarios/scenario_data.csv
+# 4. AI Pipeline
 
+The AI pipeline is organized into eight stages.
 
-## CONTROL COMMANDS
+```text
+1. Feature Engineering
+        ↓
+2. Baseline
+        ↓
+3. Anomaly Detection
+        ↓
+4. Forecasting
+        ↓
+5. Maintenance Risk
+        ↓
+6. Production Impact
+        ↓
+7. Flexibility Analysis
+        ↓
+8. Final Decision
+```
 
-SET_LOAD
+## 4.1 Feature Engineering
 
-Used for anomaly injection.
-
-Example:
-
-{
-  "machine_id": "COMP_01",
-  "command": "SET_LOAD",
-  "load_percent": 110,
-  "duration_sec": 60
-}
-
-REDUCE_LOAD
-
-Used later by optimization/grid-response.
-
-RESTORE_NORMAL
-
-Returns machine to normal.
-
-
-## ANOMALY INJECTOR
+Creates the feature set used by downstream AI modules from machine and operational data.
 
 File:
 
-~/INDUS_TWIN/anomaly_injector.py
+```text
+ai_engine/feature_engineering.py
+```
 
-Technology:
+---
 
-Python + Tkinter + ROS 2
+## 4.2 Baseline
 
-Purpose:
+Establishes baseline operating behavior for the factory and machines.
 
-Select machine
-Select anomaly
-Set target load using slider
-Set duration
-Inject anomaly
-Restore normal
+Files:
 
-Current anomaly types:
+```text
+ai_engine/baseline.py
+ai_engine/save_baseline.py
+```
 
-Power Overload
-Excessive Energy Consumption
+---
 
-Current load range:
+## 4.3 Anomaly Detection
 
-50% to 130%
+Identifies abnormal machine operating behavior.
 
-The anomaly injector has already been tested successfully.
+File:
 
-Example:
+```text
+ai_engine/anomaly.py
+```
 
-COMP_01
-~50 kW normal
-→ ~56 kW
-→ >110% load
-→ ANOMALY
+Output:
 
+```text
+anomaly_output.csv
+```
 
-## BUILD
+Generated outputs are excluded from the Git repository.
 
+---
+
+## 4.4 Forecasting
+
+Produces energy/operational forecasts used by the decision pipeline.
+
+File:
+
+```text
+ai_engine/forecasting.py
+```
+
+---
+
+## 4.5 Maintenance Risk
+
+Estimates maintenance-related risk based on machine behavior.
+
+File:
+
+```text
+ai_engine/maintenance.py
+```
+
+The maintenance event manager connects detected conditions to maintenance tickets.
+
+File:
+
+```text
+ai_engine/maintenance_event_manager.py
+```
+
+---
+
+## 4.6 Production Impact
+
+Estimates how machine conditions and energy-control actions affect production.
+
+File:
+
+```text
+ai_engine/production_impact.py
+```
+
+---
+
+## 4.7 Flexibility Analysis
+
+Determines how much energy demand can be safely reduced while respecting operational constraints.
+
+File:
+
+```text
+ai_engine/flexibility.py
+```
+
+---
+
+## 4.8 Final Decision
+
+Combines the AI results into a final control decision.
+
+File:
+
+```text
+ai_engine/final_decision.py
+```
+
+The pipeline also contains:
+
+```text
+ai_engine/control_safety.py
+```
+
+which provides the safety validation layer for control actions.
+
+---
+
+# 5. Constrained Energy Optimization
+
+INDUS_TWIN includes an optimizer for safe energy flexibility deployment.
+
+File:
+
+```text
+ai_engine/optimizer.py
+```
+
+The optimizer considers machine controllability and operational constraints before recommending load reduction.
+
+The project also includes a safety layer that evaluates:
+
+```text
+Maintenance Risk
+        +
+Production Constraints
+        +
+Machine Controllability
+        ↓
+Safe Control Decision
+```
+
+This prevents energy-control actions from blindly targeting machines that should remain operational.
+
+---
+
+# 6. What-If Simulator
+
+The dashboard includes a What-If Simulator for scenario analysis.
+
+The simulator is designed to explore the effect of operational changes before applying live controls.
+
+Examples include:
+
+- One machine outage
+- Two machine outages
+- Multiple machine outages
+- Machine anomaly
+- Different anomaly severity
+- Renewable availability changes
+- Grid reduction targets
+- Combinations of the above
+
+The simulator presents scenario effects such as:
+
+- Power demand
+- Energy use
+- Production
+- Good production
+- Quality
+- Downtime
+- Grid import
+- Machine-level consequences
+- Safe flexibility
+- Grid shortfall
+- AI decision reasoning
+- Safety envelope
+
+The What-If simulation is separate from the live scenario controls. A What-If calculation does not automatically modify the factory.
+
+---
+
+# 7. Anomaly Injection Console
+
+The anomaly injector is located at:
+
+```text
+tools/anomaly_injector.py
+```
+
+It is a Tkinter GUI connected to ROS 2.
+
+The console supports:
+
+- Machine selection
+- Single-machine anomaly injection
+- Multi-machine anomaly injection
+- Anomaly type selection
+- Severity selection
+- Load adjustment
+- Temperature adjustment
+- Vibration adjustment
+- Duration control
+- Live machine monitoring
+- Persistence monitoring
+- Factory event logging
+
+Example anomaly profiles include:
+
+```text
+HIGH_LOAD
+THERMAL_OVERLOAD
+VIBRATION_SPIKE
+POWER_SURGE
+```
+
+The injector publishes commands through:
+
+```text
+/factory/control_command
+```
+
+and subscribes to factory state/event topics.
+
+---
+
+# 8. Backend
+
+The backend is implemented with FastAPI.
+
+Main backend file:
+
+```text
+dashboard/backend/main.py
+```
+
+Start the backend using:
+
+```bash
 cd ~/INDUS_TWIN
-source /opt/ros/jazzy/setup.bash
-colcon build --packages-select gazebo_factory_twin --symlink-install
-source install/setup.bash
+source .venv/bin/activate
 
+python -m uvicorn dashboard.backend.main:app \
+  --host 0.0.0.0 \
+  --port 8000
+```
 
-## RUN FACTORY
+Backend address:
+
+```text
+http://localhost:8000
+```
+
+FastAPI documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+The backend exposes APIs for dashboard data including:
+
+- Machine telemetry
+- Production
+- Quality
+- Maintenance
+- Grid data
+- Scenario data
+- AI data
+- Analytics
+- What-If simulation
+- Control/scenario operations
+
+---
+
+# 9. Frontend
+
+The dashboard is implemented using React and Vite.
+
+Directory:
+
+```text
+dashboard/frontend/
+```
+
+Important files:
+
+```text
+dashboard/frontend/
+├── index.html
+├── package.json
+├── package-lock.json
+├── vite.config.js
+├── public/
+└── src/
+```
+
+The frontend communicates with the FastAPI backend.
+
+Start the dashboard:
+
+```bash
+cd ~/INDUS_TWIN/dashboard/frontend
+npm run dev -- --host 0.0.0.0
+```
+
+Dashboard address:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# 10. ROS 2 Factory
+
+The ROS 2 package is located under:
+
+```text
+src/gazebo_factory_twin/
+```
+
+Important package files/directories include:
+
+```text
+src/gazebo_factory_twin/
+├── gazebo_factory_twin/
+├── launch/
+├── worlds/
+├── resource/
+├── package.xml
+├── setup.py
+└── setup.cfg
+```
+
+The factory launch file is:
+
+```text
+indus_twin.launch.py
+```
+
+Launch the factory:
+
+```bash
+cd ~/INDUS_TWIN
 
 source /opt/ros/jazzy/setup.bash
 source ~/INDUS_TWIN/install/setup.bash
 
-ros2 launch gazebo_factory_twin factory_twin.launch.py
+ros2 launch gazebo_factory_twin indus_twin.launch.py
+```
 
+If `install/` does not exist after cloning the repository, build the workspace first:
 
-## RUN TELEMETRY LOGGER
+```bash
+cd ~/INDUS_TWIN
 
-ros2 run gazebo_factory_twin telemetry_logger
+source /opt/ros/jazzy/setup.bash
 
+colcon build
+```
 
-## RUN PRODUCTION LOGGER
+Then:
 
-ros2 run gazebo_factory_twin production_logger
+```bash
+source install/setup.bash
+```
 
+---
 
-## VIEW TELEMETRY
+# 11. Data Architecture
 
-ros2 topic echo /factory/machine_state
+Runtime data is organized under:
 
+```text
+data/
+```
 
-## PROJECT STATUS
+## Factory Data
 
-DONE:
+```text
+data/01_factory/
+├── factory_metadata.json
+├── machine_constraints.csv
+└── machine_metadata.csv
+```
 
-Gazebo factory
-7-machine ROS 2 digital twin
-Live telemetry
-machine_telemetry.csv
-production_data.csv
-1-minute logging
-SET_LOAD
-REDUCE_LOAD
-RESTORE_NORMAL
-Tkinter anomaly injector
+These files describe the simulated factory and machine configuration.
 
+---
 
-## NEXT FACTORY-SIDE TASK
+## Operations Data
 
-Create one combined launch file:
+```text
+data/02_operations/
+├── machine_metadata.csv
+├── machine_telemetry.csv
+├── production_data.csv
+└── quality_inspection.csv
+```
 
-factory_system.launch.py
+`machine_metadata.csv` contains machine metadata.
 
-Goal:
+The telemetry and production files are runtime-generated operational data.
 
-ros2 launch gazebo_factory_twin factory_system.launch.py
+---
 
-It should start:
+## Maintenance Data
 
-Gazebo
-Factory Twin
-Telemetry Logger
-Production Logger
+```text
+data/03_maintenance/
+├── info.txt
+└── maintenance_events.csv
+```
 
+This stores maintenance-event records.
 
-# AI TEAM HANDOVER
+---
 
-The factory/simulation side is already working.
+## Grid Data
 
-DO NOT rebuild the ROS 2 factory unnecessarily.
+```text
+data/04_grid/
+└── grid_data.csv
+```
 
-AI should consume live telemetry from:
+This stores simulated grid-related runtime data.
 
-/factory/machine_state
+---
 
-and use:
+## Scenario Data
 
-machine_telemetry.csv
-production_data.csv
-machine_metadata.csv
-machine_constraints.csv
-maintenance_events.csv
-grid_data.csv
-scenario_data.csv
+```text
+data/05_scenarios/
+└── scenario_data.csv
+```
 
+This stores scenario execution data.
 
-## AI DATA
+---
 
-Recommended new directory:
+## AI Features
 
+```text
 data/06_ai/
+└── ai_features.csv
+```
 
-Recommended derived feature file:
+This stores the generated feature dataset used by the AI pipeline.
 
-data/06_ai/ai_features.csv
+---
 
-Do not create unnecessary duplicate raw sensor CSV files.
+# 12. Factory Configuration
 
+Global scenario configuration:
 
-## IMPORTANT AI FEATURES
+```text
+config/scenarios.json
+```
 
-power deviation
-expected vs actual power
-energy per unit
-production efficiency
-rolling power statistics
-rolling production statistics
-temperature deviation
-vibration deviation
-overload flag
-idle-energy flag
-shift
-time of day
-machine criticality
-grid stress
+Factory metadata and machine constraints are stored under:
 
+```text
+data/01_factory/
+```
 
-## AI OUTPUTS
+This separates configuration from generated operational data.
 
-The AI should eventually output:
+---
 
-anomaly_score
-anomaly_type
-confidence
-expected_power_kw
-actual_power_kw
-excess_power_kw
-energy_waste
-production_impact
-recoverable_flexibility_kw
-recommended_action
+# 13. Project File Structure
 
+The important repository structure is:
 
-## AI MAIN QUESTIONS
+```text
+INDUS_TWIN/
+│
+├── ai_engine/
+│   ├── ai_api.py
+│   ├── anomaly.py
+│   ├── baseline.py
+│   ├── control_safety.py
+│   ├── feature_engineering.py
+│   ├── final_decision.py
+│   ├── flexibility.py
+│   ├── forecasting.py
+│   ├── maintenance.py
+│   ├── maintenance_event_manager.py
+│   ├── optimizer.py
+│   ├── production_impact.py
+│   ├── production_quality.py
+│   ├── quality_inspection.py
+│   ├── run_pipeline.py
+│   ├── save_baseline.py
+│   ├── requirements.txt
+│   └── streamlit_dashboard.py
+│
+├── config/
+│   └── scenarios.json
+│
+├── data/
+│   ├── 01_factory/
+│   ├── 02_operations/
+│   ├── 03_maintenance/
+│   ├── 04_grid/
+│   ├── 05_scenarios/
+│   └── 06_ai/
+│
+├── dashboard/
+│   ├── backend/
+│   │   └── main.py
+│   │
+│   └── frontend/
+│       ├── index.html
+│       ├── package.json
+│       ├── package-lock.json
+│       ├── vite.config.js
+│       ├── public/
+│       └── src/
+│
+├── src/
+│   └── gazebo_factory_twin/
+│       ├── gazebo_factory_twin/
+│       ├── launch/
+│       ├── worlds/
+│       ├── resource/
+│       ├── package.xml
+│       ├── setup.py
+│       └── setup.cfg
+│
+├── tools/
+│   └── anomaly_injector.py
+│
+├── anomaly_injector.py
+├── Data_Files_Readme.md
+├── README.md
+├── requirements.txt
+├── .gitignore
+└── start_indus_twin.sh
+```
 
-1. Is the machine behaving abnormally?
+Generated directories such as:
 
-2. How much energy is being wasted compared with its expected behaviour?
+```text
+build/
+install/
+log/
+node_modules/
+dist/
+__pycache__/
+```
 
-3. How much demand can safely be reduced without unacceptable production impact?
+are not source-code components and should remain excluded from Git.
 
+The Python virtual environment is also kept local and excluded from Git:
 
-## AI PIPELINE
+```text
+.venv/
+```
 
-Historical data
-+
-Live/simulated data
-↓
-Feature engineering
-↓
-Machine-specific baseline
-↓
-Anomaly detection
-↓
-Energy-waste estimation
-↓
-Production-impact prediction
-↓
-Flexibility estimation
-↓
-Live inference
+---
 
+# 14. One-Command Launcher
 
-## IMPORTANT PROJECT CONCEPT
+The project includes:
 
-The AI should NOT only detect faults.
+```text
+start_indus_twin.sh
+```
 
-It should connect:
+It opens separate terminals for the main components.
 
-Machine condition
-+
-Energy consumption
-+
-Production behaviour
+Run:
 
-to determine:
+```bash
+cd ~/INDUS_TWIN
+chmod +x start_indus_twin.sh
+./start_indus_twin.sh
+```
 
-Energy waste
-+
-Safe demand flexibility
-+
-Production impact.
+The launcher starts:
 
+```text
+1. FastAPI Backend
+2. React Frontend
+3. ROS 2 Factory Twin
+4. tools/anomaly_injector.py
+```
 
-## FINAL TARGET ARCHITECTURE
+The individual commands remain available if manual startup is preferred.
 
-Gazebo Factory
-↓
-ROS 2 Factory Twin
-↓
-Live Telemetry
-↓
-AI Intelligence
-↓
-Energy-Waste Detection
-↓
+---
+
+# 15. Manual Startup
+
+## Terminal 1 — Backend
+
+```bash
+cd ~/INDUS_TWIN
+source .venv/bin/activate
+
+python -m uvicorn dashboard.backend.main:app \
+  --host 0.0.0.0 \
+  --port 8000
+```
+
+## Terminal 2 — Frontend
+
+```bash
+cd ~/INDUS_TWIN/dashboard/frontend
+
+npm run dev -- --host 0.0.0.0
+```
+
+## Terminal 3 — ROS 2 Factory
+
+```bash
+cd ~/INDUS_TWIN
+
+source /opt/ros/jazzy/setup.bash
+source ~/INDUS_TWIN/install/setup.bash
+
+ros2 launch gazebo_factory_twin indus_twin.launch.py
+```
+
+## Terminal 4 — Anomaly Injector
+
+```bash
+cd ~/INDUS_TWIN
+source .venv/bin/activate
+
+python tools/anomaly_injector.py
+```
+
+---
+
+# 16. Typical Data Flow
+
+A typical anomaly-to-decision workflow is:
+
+```text
+User selects machine
+        ↓
+Tkinter Anomaly Injector
+        ↓
+ROS 2 control command
+        ↓
+Factory Twin changes machine telemetry
+        ↓
+Telemetry Logger records data
+        ↓
+AI Feature Engineering
+        ↓
+Anomaly Detection
+        ↓
+Persistence Evaluation
+        ↓
+Maintenance Risk
+        ↓
 Production Impact
-↓
-Recoverable Flexibility
-↓
-Virtual Energy Reserve
-↓
+        ↓
+Flexibility Analysis
+        ↓
+Safety Validation
+        ↓
+Final Decision
+        ↓
+FastAPI
+        ↓
+React Dashboard
+```
+
+For a persistent severe anomaly:
+
+```text
+Abnormal readings
+      ↓
+6 / 8 persistence
+      ↓
+HIGH / CRITICAL
+      ↓
+FAULT
+      ↓
+Maintenance ticket
+      ↓
+SUBMITTED
+      ↓
+ONGOING
+      ↓
+MAINTENANCE
+      ↓
+COMPLETED
+      ↓
+RUNNING
+```
+
+---
+
+# 17. Grid-Resilience Workflow
+
+The energy flexibility workflow is:
+
+```text
+Grid Scenario
+      ↓
+Current Factory Demand
+      ↓
+Machine Constraints
+      ↓
+Maintenance Risk
+      ↓
+Production Constraints
+      ↓
+Machine Controllability
+      ↓
 Optimization
-↓
-ROS 2 Control
-↓
-Factory Response
+      ↓
+Safe Deployable Flexibility
+      ↓
+Control Decision
+```
+
+The system can distinguish between:
+
+```text
+Required Grid Reduction
+        vs
+Safe Deployable Flexibility
+```
+
+This allows the dashboard to show both the requested grid response and the amount that can actually be deployed without violating operational constraints.
+
+---
+
+# 18. Maintenance and Production Interaction
+
+Production impact is treated as an operational constraint rather than evaluating energy savings alone.
+
+Conceptually:
+
+```text
+Energy Reduction
+      +
+Production Impact
+      +
+Quality Impact
+      +
+Downtime
+      +
+Maintenance Risk
+      ↓
+Control Safety
+```
+
+This provides a basis for evaluating energy actions in the context of factory operations.
+
+---
+
+# 19. Runtime Files vs Source Files
+
+## Source / Configuration
+
+These should remain in the repository:
+
+```text
+ai_engine/*.py
+config/
+data/01_factory/
+dashboard/
+src/
+tools/
+README.md
+Data_Files_Readme.md
+requirements.txt
+.gitignore
+start_indus_twin.sh
+```
+
+## Generated / Runtime
+
+These are generated while the system runs and should not be committed:
+
+```text
+build/
+install/
+log/
+.venv/
+node_modules/
+dist/
+__pycache__/
+*.pyc
+```
+
+AI output CSV files are also runtime-generated:
+
+```text
+ai_engine/*_output.csv
+```
+
+and are excluded through `.gitignore`.
+
+---
+
+# 20. Requirements
+
+The project expects the following major runtime components:
+
+- Ubuntu/Linux environment
+- ROS 2 Jazzy
+- Gazebo
+- Python
+- Python virtual environment
+- FastAPI / Uvicorn
+- React
+- Vite
+- Node.js / npm
+- Pandas
+- NumPy
+- Scikit-learn where required by the AI modules
+- OR-Tools
+
+Python dependencies are listed in:
+
+```text
+requirements.txt
+```
+
+The AI directory also contains:
+
+```text
+ai_engine/requirements.txt
+```
+
+Use the project requirements file appropriate to the environment being configured.
+
+---
+
+# 21. Fresh Clone Setup
+
+After cloning the repository:
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd INDUS_TWIN
+```
+
+Create/activate the Python environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Install frontend dependencies:
+
+```bash
+cd dashboard/frontend
+npm install
+cd ../..
+```
+
+Build the ROS 2 package:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+colcon build
+```
+
+Source the generated workspace:
+
+```bash
+source install/setup.bash
+```
+
+Then launch the system.
+
+---
+
+# 22. Useful URLs
+
+When the system is running:
+
+### Dashboard
+
+```text
+http://localhost:5173
+```
+
+### FastAPI
+
+```text
+http://localhost:8000
+```
+
+### FastAPI Swagger UI
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+# 23. Common Troubleshooting
+
+## `install/setup.bash` not found
+
+Build the ROS workspace:
+
+```bash
+cd ~/INDUS_TWIN
+source /opt/ros/jazzy/setup.bash
+colcon build
+source install/setup.bash
+```
+
+---
+
+## Backend does not start
+
+Check that the virtual environment exists:
+
+```bash
+ls ~/INDUS_TWIN/.venv/bin/activate
+```
+
+Then:
+
+```bash
+cd ~/INDUS_TWIN
+source .venv/bin/activate
+python -m uvicorn dashboard.backend.main:app --host 0.0.0.0 --port 8000
+```
+
+---
+
+## Frontend does not start
+
+Go to:
+
+```bash
+cd ~/INDUS_TWIN/dashboard/frontend
+```
+
+Install dependencies if necessary:
+
+```bash
+npm install
+```
+
+Then:
+
+```bash
+npm run dev -- --host 0.0.0.0
+```
+
+---
+
+## Anomaly Injector does not start
+
+Use the current injector:
+
+```bash
+cd ~/INDUS_TWIN
+source .venv/bin/activate
+python tools/anomaly_injector.py
+```
+
+---
+
+## ROS 2 commands not found
+
+Source ROS 2:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+```
+
+Then source the workspace:
+
+```bash
+source ~/INDUS_TWIN/install/setup.bash
+```
+
+---
+
+# 24. Git Repository Hygiene
+
+Do not commit:
+
+```text
+.venv/
+build/
+install/
+log/
+node_modules/
+dist/
+__pycache__/
+*.pyc
+AI generated output CSVs
+runtime telemetry
+runtime production data
+runtime grid/scenario data
+```
+
+The repository should contain the reproducible source code, configuration, factory definitions, and documentation rather than local environments and temporary runtime artifacts.
+
+---
+
+# 25. Project Philosophy
+
+INDUS_TWIN is designed around the idea that industrial energy management should not be treated as a simple load-shedding problem.
+
+An energy action must be evaluated together with:
+
+```text
+Factory State
++
+Machine Health
++
+Maintenance Risk
++
+Production
++
+Quality
++
+Downtime
++
+Grid Conditions
++
+Machine Controllability
+```
+
+The digital twin provides the simulated operational environment.
+
+ROS 2 provides machine and control communication.
+
+The AI pipeline transforms telemetry into operational insights.
+
+Optimization finds constrained flexibility.
+
+Safety validation determines whether a control action is acceptable.
+
+FastAPI exposes the system to the dashboard.
+
+React provides the operator-facing interface.
+
+Together, these components form the INDUS_TWIN industrial energy digital-twin workflow.

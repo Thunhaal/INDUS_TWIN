@@ -6,3 +6,74 @@ requests
 streamlit
 scikit-learn
 python-dateutil
+
+
+
+
+# =========================================================
+# INDUS_TWIN — FIRST TIME SETUP
+# =========================================================
+
+git clone <YOUR_GITHUB_REPO_URL>
+cd INDUS_TWIN
+
+# ---------------------------------------------------------
+# 1. Create Python virtual environment
+# ---------------------------------------------------------
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# AI-specific dependencies
+pip install -r ai_engine/requirements.txt
+
+# ---------------------------------------------------------
+# 2. Frontend dependencies
+# ---------------------------------------------------------
+cd dashboard/frontend
+
+npm install
+
+cd ../..
+
+# ---------------------------------------------------------
+# 3. ROS 2 setup
+# ---------------------------------------------------------
+source /opt/ros/jazzy/setup.bash
+
+# Install ROS package dependencies
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+# ---------------------------------------------------------
+# 4. Build ROS workspace
+# ---------------------------------------------------------
+colcon build
+
+# Source the workspace
+source install/setup.bash
+
+
+
+cd ~/INDUS_TWIN
+source .venv/bin/activate
+python -m uvicorn dashboard.backend.main:app --host 0.0.0.0 --port 8000
+
+cd ~/INDUS_TWIN/dashboard/frontend
+npm run dev -- --host 0.0.0.0
+
+
+cd ~/INDUS_TWIN
+source /opt/ros/jazzy/setup.bash
+source ~/INDUS_TWIN/install/setup.bash
+ros2 launch gazebo_factory_twin indus_twin.launch.py
+
+
+
+cd ~/INDUS_TWIN
+python anomaly_injector.py

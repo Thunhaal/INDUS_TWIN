@@ -399,7 +399,7 @@ def compute_maintenance_risk(
         df,
         value_column="vibration_mm_s",
         mean_column="vibration_baseline_mm_s",
-        std_column="vibration_std_mm_s",
+        std_column="vibration_std_c",
         z_column="vibration_zscore"
     )
 
@@ -541,6 +541,10 @@ def compute_maintenance_risk(
     #
     # This indicates that an event may need to be created.
     # It does NOT create/update maintenance_events.csv.
+    #
+    # A trigger is raised for:
+    #   - medium/high computed maintenance risk, OR
+    #   - any severe sensor anomaly.
     # --------------------------------------------------------
 
     df["maintenance_trigger"] = (
@@ -558,6 +562,17 @@ def compute_maintenance_risk(
 
     # --------------------------------------------------------
     # 14. Maintenance reason
+    #
+    # IMPORTANT CONSISTENCY FIX
+    #
+    # Previously, maintenance_trigger could be TRUE because the
+    # composite maintenance risk crossed MEDIUM, while
+    # maintenance_reason still returned NORMAL because no single
+    # sensor crossed the anomaly z-score threshold.
+    #
+    # The reason now always explains every triggered event:
+    #   sensor anomaly reasons when present
+    #   otherwise the composite maintenance-risk level.
     # --------------------------------------------------------
 
     def build_reason(
@@ -593,12 +608,27 @@ def compute_maintenance_risk(
                 "RPM_DEVIATION"
             )
 
-        if not reasons:
-            return "NORMAL"
+        if reasons:
+            return " + ".join(reasons)
 
-        return " + ".join(
-            reasons
+        risk = float(
+            row["maintenance_risk"]
         )
+
+        if risk >= HIGH_RISK_THRESHOLD:
+            return "HIGH_MAINTENANCE_RISK"
+
+        if risk >= MEDIUM_RISK_THRESHOLD:
+            return "MEDIUM_MAINTENANCE_RISK"
+
+        if (
+            row["severe_temperature_anomaly"]
+            or row["severe_vibration_anomaly"]
+            or row["severe_rpm_anomaly"]
+        ):
+            return "SEVERE_SENSOR_ANOMALY"
+
+        return "NORMAL"
 
     df["maintenance_reason"] = (
         df.apply(
@@ -647,13 +677,53 @@ def compute_maintenance_risk(
 
     # --------------------------------------------------------
     # 17. Final output
+    #
+    # Preserve the original maintenance-analysis columns AND
+    # carry through the factory twin's existing machine-state,
+    # fault, persistence, escalation, anomaly, and scenario data.
+    #
+    # No persistence logic is recalculated here.
     # --------------------------------------------------------
 
     output_columns = [
+        # Core identity/state.
         "timestamp",
         "machine_id",
         "state",
 
+        # Factory fault state.
+        "faulted",
+        "fault_code",
+        "fault_reason",
+        "fault_timestamp",
+
+        # Factory maintenance state.
+        "maintenance_mode",
+        "maintenance_started_at",
+        "maintenance_required",
+
+        # 6/8 persistence telemetry.
+        "persistence_count",
+        "persistence_window",
+        "persistence_threshold",
+        "persistence_ratio",
+        "persistence_escalated",
+        "escalation_state",
+        "damage_level",
+
+        # Factory anomaly state.
+        "anomaly",
+        "anomaly_type",
+        "anomaly_severity",
+        "anomaly_started_at",
+        "anomaly_source",
+        "manual_anomaly_active",
+
+        # Scenario state.
+        "scenario_id",
+        "scenario_type",
+
+        # Maintenance-analysis measurements.
         "temperature_c",
         "temperature_baseline_c",
         "temperature_deviation_c",

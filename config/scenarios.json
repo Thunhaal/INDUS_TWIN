@@ -7,7 +7,8 @@
     "solar_available_power_kw": 15,
     "required_reduction_kw": 0,
     "minimum_production_percent": 95,
-    "battery_available_kwh": 100
+    "battery_available_kwh": 100,
+    "demand_multiplier": 1.00
   },
 
   "GRID_STRESS": {
@@ -18,7 +19,8 @@
     "solar_available_power_kw": 10,
     "required_reduction_kw": 15,
     "minimum_production_percent": 95,
-    "battery_available_kwh": 80
+    "battery_available_kwh": 80,
+    "demand_multiplier": 1.02
   },
 
   "PEAK_DEMAND": {
@@ -29,7 +31,8 @@
     "solar_available_power_kw": 10,
     "required_reduction_kw": 15,
     "minimum_production_percent": 95,
-    "battery_available_kwh": 80
+    "battery_available_kwh": 80,
+    "demand_multiplier": 1.05
   },
 
   "LOW_RENEWABLE": {
@@ -40,7 +43,8 @@
     "solar_available_power_kw": 2,
     "required_reduction_kw": 0,
     "minimum_production_percent": 95,
-    "battery_available_kwh": 80
+    "battery_available_kwh": 80,
+    "demand_multiplier": 1.00
   },
 
   "CRITICAL_GRID": {
@@ -51,6 +55,23 @@
     "solar_available_power_kw": 5,
     "required_reduction_kw": 30,
     "minimum_production_percent": 90,
-    "battery_available_kwh": 60
+    "battery_available_kwh": 60,
+    "demand_multiplier": 1.06
+  },
+
+  "EQUIPMENT_ANOMALY": {
+    "scenario_name": "CNC-03 Equipment Anomaly",
+    "scenario_type": "EQUIPMENT_ANOMALY",
+    "duration_min": 5,
+    "grid_available_power_kw": 250,
+    "solar_available_power_kw": 15,
+    "required_reduction_kw": 0,
+    "minimum_production_percent": 90,
+    "battery_available_kwh": 100,
+    "demand_multiplier": 1.00,
+    "anomaly_machine_id": "CNC_03",
+    "anomaly_load_percent": 118,
+    "anomaly_temperature_offset_c": 30,
+    "anomaly_vibration_offset_mm_s": 4.5
   }
 }
