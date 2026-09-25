@@ -70,10 +70,24 @@ npm run dev -- --host 0.0.0.0
 
 cd ~/INDUS_TWIN
 source /opt/ros/jazzy/setup.bash
+colcon build
+cd ~/INDUS_TWIN
+source /opt/ros/jazzy/setup.bash
 source ~/INDUS_TWIN/install/setup.bash
 ros2 launch gazebo_factory_twin indus_twin.launch.py
 
 
 
 cd ~/INDUS_TWIN
-python anomaly_injector.py
+source .venv/bin/activate
+python tools/anomaly_injector.py
+
+cloudflared tunnel --url http://localhost:8000
+
+
+cd ~/INDUS-TWIN-LINK
+grep -n 'const API' src/App.jsx
+sed -i 's#const API = ".*";#const API = ";#' src/App.jsx
+git add src/App.jsx
+git commit -m "Update live API tunnel"
+git push

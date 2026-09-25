@@ -45,7 +45,7 @@ import {
 } from "recharts";
 import "./index.css";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://electro-accommodations-brave-algebra.trycloudflare.com";
 
 const NAV = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
